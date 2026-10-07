@@ -1,0 +1,118 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#000"><title>Nexus</title>
+<style>
+:root{--r:#ff1f3d;--d:#6b0014;--bg:#000;--p:#120508;--l:#2a0a10;--t:#f2e8e9;--m:#8a6a6f}
+*{box-sizing:border-box;margin:0}[hidden]{display:none!important}
+body{background:var(--bg);color:var(--t);font:15px system-ui,sans-serif;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+input,button{font:inherit;color:inherit}
+input{background:var(--p);border:1px solid var(--l);border-radius:8px;padding:12px;width:100%;outline:0}
+input:focus{border-color:var(--r);box-shadow:0 0 8px #ff1f3d55}
+.b,.b2{border:1px solid var(--r);background:var(--r);color:#000;font-weight:700;border-radius:8px;padding:11px 16px;cursor:pointer}
+.b2{background:0;color:var(--r)}.i{background:0;border:0;font-size:20px;cursor:pointer;color:var(--r)}
+#lo{flex:1;display:flex;flex-direction:column;justify-content:center;gap:12px;padding:28px;max-width:380px;margin:auto;width:100%}
+#lo h1{text-align:center;font-size:34px;letter-spacing:6px;color:var(--r);text-shadow:3px 0 var(--d),-2px 0 #fff3,0 0 18px var(--r)}
+#lgo{text-align:center}#er{color:var(--r);text-align:center;min-height:18px}
+#ap{flex:1;display:flex;flex-direction:column;min-height:0}
+header{display:flex;align-items:center;gap:10px;padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top));border-bottom:1px solid var(--l)}
+header b{flex:1;font-size:17px}
+main{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+nav{display:flex;border-top:1px solid var(--l);padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;background:0;border:0;padding:8px 2px;color:var(--m);font-size:11px;cursor:pointer}
+nav button i{display:block;font-style:normal;font-size:20px}nav .on{color:var(--r);text-shadow:0 0 10px var(--r)}
+.row{display:flex;align-items:center;gap:10px;background:var(--p);border:1px solid var(--l);border-radius:10px;padding:10px}
+.row>.pc{font-size:24px;width:36px;text-align:center}.row>div:nth-child(2){flex:1}.row small{color:var(--m);display:block}
+.add{display:flex;gap:8px}.e{color:var(--m);text-align:center;padding:10px}
+.ov{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;z-index:5}
+#ms{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.m{background:var(--p);border:1px solid var(--l);border-radius:12px 12px 12px 2px;padding:7px 11px;max-width:80%;align-self:flex-start;word-break:break-word}
+.m.me{align-self:flex-end;border-color:var(--d);border-radius:12px 12px 2px 12px}
+.m .s{font-size:13px;line-height:1}.m .n{font-size:12px;color:var(--r);font-weight:700}.m .t{font-size:10px;color:var(--m);text-align:right}
+#sf{display:flex;gap:8px;padding:8px;padding-bottom:calc(8px + env(safe-area-inset-bottom));border-top:1px solid var(--l)}
+#sb{flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+#sb h3{color:var(--r);margin-top:8px}.sw{display:flex;gap:8px}.sq{width:38px;height:38px;border-radius:8px;border:1px solid var(--r);cursor:pointer}
+.cd{font:700 20px monospace;color:var(--r);text-align:center;user-select:all}
+.rw{display:flex;align-items:center;gap:8px}.rw span{flex:1}.rw select{background:var(--p);color:var(--t);border:1px solid var(--l);border-radius:6px;padding:6px}
+.gm{display:grid;grid-template-columns:1fr 1fr;gap:8px}.gm div{background:var(--p);border:1px dashed var(--l);border-radius:10px;padding:16px;text-align:center;color:var(--m)}
+.gm b{display:block;font-size:26px}
+</style></head><body>
+<div id="lo"><div id="lgo"></div><h1>NEXUS</h1><input id="u" placeholder="Identifiant" autocapitalize="off" autocomplete="username"><input id="p" type="password" placeholder="Mot de passe" autocomplete="current-password"><button id="bi" class="b">Connexion</button><button id="bc" class="b2">Créer un compte</button><div id="er"></div></div>
+<div id="ap" hidden><header><span id="hl"></span><b id="ht"></b><button id="out" class="i" title="Déconnexion">⏻</button></header><main id="mn"></main><nav id="nv"></nav></div>
+<div id="ch" class="ov" hidden><header><button id="bk" class="i">←</button><b id="cn"></b><button id="gb" class="i" hidden>⚙️</button></header><div id="ms"></div><form id="sf"><input id="si" placeholder="Message" autocomplete="off"><button class="b">Envoyer</button></form></div>
+<div id="st" class="ov" hidden><header><button id="sx" class="i">←</button><b>Paramètres du groupe</b></header><div id="sb"></div></div>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getAuth,signInWithEmailAndPassword as si,createUserWithEmailAndPassword as cu,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{getDatabase,ref,get,set,update,push,onValue,onChildAdded,query,limitToLast}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+const app=initializeApp({apiKey:"AIzaSyALeA47_dCHOMig--HHgBE1a1FkvuEJ3ws",authDomain:"nexus-36f39.firebaseapp.com",databaseURL:"https://nexus-36f39-default-rtdb.firebaseio.com",projectId:"nexus-36f39",storageBucket:"nexus-36f39.firebasestorage.app",messagingSenderId:"854510630251",appId:"1:854510630251:web:01cdbb3ac583b29cdb882e"});
+const auth=getAuth(app),db=getDatabase(app),$=s=>document.querySelector(s),PW="#nx",SYM={a:"👑",o:"🎖️",r:"🧢"};
+const E=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+const R=p=>ref(db,p),em=l=>l+"@nexus.app",NC={};
+const nm=async u=>NC[u]??=(await get(R('users/'+u+'/name'))).val()||'?';
+const LOGO='<path d="M10 12h46v32H32L19 56V44H10z" fill="none" stroke="#6b0014" stroke-width="5" transform="translate(3 2)"/><path d="M10 12h46v32H32L19 56V44H10z" fill="#0a0002" stroke="#ff1f3d" stroke-width="4"/><path d="M20 36V20l12 16V20" fill="none" stroke="#ff1f3d" stroke-width="4"/><rect x="2" y="25" width="26" height="3" fill="#ff1f3d"/><rect x="40" y="33" width="22" height="3" fill="#fff"/>';
+const svg=z=>`<svg width="${z}" height="${z}" viewBox="0 0 64 64" style="filter:drop-shadow(0 0 6px #ff1f3d)">${LOGO}</svg>`;
+$('#lgo').innerHTML=svg(90);$('#hl').innerHTML=svg(28);
+try{const ic='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#000"/>'+LOGO+'</svg>');
+const l=document.createElement('link');l.rel='manifest';l.href=URL.createObjectURL(new Blob([JSON.stringify({name:"Nexus",short_name:"Nexus",start_url:location.href,display:"standalone",background_color:"#000000",theme_color:"#000000",icons:[{src:ic,sizes:"any",type:"image/svg+xml",purpose:"any"}]})],{type:'application/json'}));document.head.append(l)}catch{}
+let me,U=[],CU=[],cur,G,gid;
+// ---- Connexion
+const err=t=>$('#er').textContent=t;
+async function mk(n,l,p){const c=await cu(auth,em(l),p+PW);await set(R('names/'+l),c.user.uid);await set(R('users/'+c.user.uid),{name:n})}
+async function login(create){const n=$('#u').value.trim(),l=n.toLowerCase(),p=$('#p').value;err('');
+if(!/^[a-z0-9_]{3,16}$/.test(l))return err('Identifiant : 3 à 16 lettres, chiffres ou _');if(!p)return err('Entre un mot de passe');
+try{if(create)await mk(n,l,p);else try{await si(auth,em(l),p+PW)}catch(e){if(l=='krynox'&&p=='152')await mk('KryNox',l,p);else throw e}}
+catch(e){err(create?'Identifiant déjà pris ou invalide':'Identifiant ou mot de passe incorrect')}}
+$('#bi').onclick=()=>login(0);$('#bc').onclick=()=>login(1);$('#p').onkeydown=e=>e.key=='Enter'&&login(0);
+$('#out').onclick=()=>{closeChat();signOut(auth)};
+onAuthStateChanged(auth,async u=>{if(!u){me=null;U.forEach(f=>f());U=[];$('#lo').hidden=false;$('#ap').hidden=true;return}
+let n=null;for(let i=0;i<12&&!n;i++){n=(await get(R('users/'+u.uid+'/name'))).val();if(!n)await new Promise(r=>setTimeout(r,400))}
+me={uid:u.uid,name:n||'?'};$('#lo').hidden=true;$('#ap').hidden=false;tab(0)});
+// ---- Onglets
+const T=['Mess','Groupes','Amis','Codes & jeux'],I=['💬','👥','🤝','🎮'];
+T.forEach((t,i)=>{const b=E('button');b.innerHTML=`<i>${I[i]}</i>${t}`;b.onclick=()=>tab(i);$('#nv').append(b)});
+function tab(i){U.forEach(f=>f());U=[];$('#ht').textContent=T[i];[...$('#nv').children].forEach((b,j)=>b.classList.toggle('on',i==j));const m=$('#mn');m.replaceChildren();[tMess,tGroups,tFriends,tCodes][i](m)}
+function row(ic,t,s,fn){const r=E('div','row');r.append(E('div','pc',ic));const d=E('div');d.append(E('b',0,t));if(s)d.append(E('small',0,s));r.append(d);if(fn){r.style.cursor='pointer';r.onclick=fn}return r}
+function box(i,b){const d=E('div','add');d.append(i,b);b.style.whiteSpace='nowrap';return d}
+function tMess(m){U.push(onValue(R('friends/'+me.uid),async s=>{const v=s.val()||{},rs=[];
+for(const f in v)if(v[f]=='ok'){const n=await nm(f);rs.push(row('👤',n,'Message privé',()=>openChat({path:'dms/'+[me.uid,f].sort().join('_'),title:n})))}
+m.replaceChildren(...(rs.length?rs:[E('p','e',"Aucune discussion. Ajoute un ami dans l'onglet Amis.")]))}))}
+function tGroups(m){const l=E('div'),i=E('input'),b=E('button','b','Créer');l.style.cssText='display:flex;flex-direction:column;gap:8px';i.placeholder='Nom du nouveau groupe';
+b.onclick=async()=>{const n=i.value.trim();if(!n)return;const id=push(R('groups')).key;await update(ref(db),{['groups/'+id]:{name:n,pic:'💬',bg:'#000000',owner:me.uid,members:{[me.uid]:'a'}},[`users/${me.uid}/groups/${id}`]:true});i.value=''};
+m.append(box(i,b),l);
+U.push(onValue(R('users/'+me.uid+'/groups'),async s=>{const rs=[];for(const g in s.val()||{}){try{const d=(await get(R('groups/'+g))).val();if(d)rs.push(row(d.pic,d.name,(SYM[d.members[me.uid]]||'')+' '+Object.keys(d.members).length+' membre(s)',()=>openChat({path:'gmsg/'+g,title:d.name,gid:g})))}catch{}}
+l.replaceChildren(...(rs.length?rs:[E('p','e','Crée un groupe ou rejoins-en un avec un code.')]))}))}
+function tFriends(m){const i=E('input'),b=E('button','b','Demander'),g=E('div','e'),l=E('div');l.style.cssText='display:flex;flex-direction:column;gap:8px';i.placeholder='Pseudo exact';
+b.onclick=async()=>{const n=i.value.trim().toLowerCase();if(!n)return;const f=(await get(R('names/'+n))).val();
+if(!f)return g.textContent='Aucun compte avec ce pseudo';if(f==me.uid)return g.textContent="C'est toi !";
+if((await get(R(`friends/${me.uid}/${f}`))).exists())return g.textContent='Déjà ami ou demande en cours';
+await update(ref(db),{[`friends/${me.uid}/${f}`]:'out',[`friends/${f}/${me.uid}`]:'in'});g.textContent='Demande envoyée ✔';i.value=''};
+m.append(box(i,b),g,l);
+U.push(onValue(R('friends/'+me.uid),async s=>{const v=s.val()||{},rs=[];for(const f in v){const r=row('👤',await nm(f),{in:'Demande reçue',out:'En attente',ok:'Ami'}[v[f]]);
+if(v[f]=='in'){const a=E('button','b','✔'),d=E('button','b2','✖');a.onclick=()=>update(ref(db),{[`friends/${me.uid}/${f}`]:'ok',[`friends/${f}/${me.uid}`]:'ok'});d.onclick=()=>update(ref(db),{[`friends/${me.uid}/${f}`]:null,[`friends/${f}/${me.uid}`]:null});r.append(a,d)}rs.push(r)}
+l.replaceChildren(...rs)}))}
+function tCodes(m){const i=E('input'),b=E('button','b','Rejoindre'),g=E('div','e');i.placeholder='NX-XXXXXXXX';
+b.onclick=async()=>{const c=i.value.trim().toUpperCase();if(!c)return;const s=await get(R('codes/'+c));if(!s.exists())return g.textContent='Code invalide ou déjà utilisé';const k=s.val().g;
+try{await update(ref(db),{[`groups/${k}/members/${me.uid}`]:'m',[`users/${me.uid}/groups/${k}`]:true,['codes/'+c]:null});g.textContent='Groupe rejoint ✔ (onglet Groupes)';i.value=''}catch{g.textContent='Impossible de rejoindre (banni ?)'}};
+const gm=E('div','gm');['Quiz','Morpion','Pendu','Devine le nombre'].forEach(x=>{const d=E('div');d.append(E('b',0,'🎮'),x,E('small',0,' bientôt'));gm.append(d)});
+m.append(box(i,b),g,E('h3',0,'Jeux'),gm)}
+// ---- Chat
+const hm=t=>new Date(t).toLocaleTimeString('fr',{hour:'2-digit',minute:'2-digit'});
+function add(v){const d=E('div','m'+(v.u==me.uid?' me':'')),r=G?.members?.[v.u];if(SYM[r])d.append(E('div','s',SYM[r]));d.append(E('div','n',v.n),E('div',0,v.x),E('div','t',hm(v.t)));const b=$('#ms');b.append(d);b.scrollTop=1e9}
+function openChat(o){cur=o;gid=o.gid;G=null;$('#ch').hidden=false;$('#ms').replaceChildren();$('#ms').style.background='';$('#cn').textContent=o.title;$('#gb').hidden=true;
+const go=()=>CU.push(onChildAdded(query(R(o.path),limitToLast(150)),s=>add(s.val())));
+if(gid){let f=1;CU.push(onValue(R('groups/'+gid),s=>{G=s.val();if(!G)return closeChat();$('#cn').textContent=G.pic+' '+G.name;$('#ms').style.background=G.bg;const r=G.members?.[me.uid];$('#gb').hidden=!(r=='a'||r=='o');if(!$('#st').hidden)openSet();if(f){f=0;go()}},()=>closeChat()))}else go()}
+function closeChat(){CU.forEach(f=>f());CU=[];$('#ch').hidden=true;$('#st').hidden=true;G=gid=null}
+$('#bk').onclick=closeChat;$('#sx').onclick=()=>$('#st').hidden=true;$('#gb').onclick=openSet;
+$('#sf').onsubmit=e=>{e.preventDefault();const x=$('#si').value.trim();if(!x)return;$('#si').value='';push(R(cur.path),{u:me.uid,n:me.name,t:Date.now(),x})};
+// ---- Paramètres du groupe
+function openSet(){const my=G.members[me.uid],ad=my=='a',b=$('#sb'),gp='groups/'+gid;b.replaceChildren();$('#st').hidden=false;
+const n=E('input'),p=E('input'),sv=E('button','b','Enregistrer'),cs=E('div','sw'),gc=E('button','b','Générer un code (1 utilisation)'),cd=E('div','cd');
+n.value=G.name;p.value=G.pic;p.maxLength=4;p.placeholder='Emoji de la photo de groupe';
+sv.onclick=()=>update(R(gp),{name:n.value.trim()||G.name,pic:p.value||'💬'});
+['#000000','#1a0006','#001a0e','#00101f','#1a1200'].forEach(c=>{const s=E('button','sq');s.style.background=c;s.onclick=()=>set(R(gp+'/bg'),c);cs.append(s)});
+gc.onclick=async()=>{const c='NX-'+Array.from(crypto.getRandomValues(new Uint8Array(8)),x=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[x%32]).join('');await set(R('codes/'+c),{g:gid});cd.textContent=c};
+b.append(E('h3',0,'Nom et photo'),n,p,sv,E('h3',0,'Fond du chat'),cs,E('h3',0,'Invitation'),gc,cd,E('h3',0,'Membres'));
+for(const u in G.members){const ro=G.members[u],r=E('div','rw'),s=E('span',0,(SYM[ro]||'')+' ');nm(u).then(x=>s.append(x));r.append(s);
+if(ad&&u!=me.uid){const sel=E('select');[['o','🎖️ Officier'],['r','🧢 Recrue'],['m','Membre']].forEach(([v,t])=>{const o=E('option',0,t);o.value=v;o.selected=v==ro;sel.append(o)});sel.onchange=()=>set(R(`${gp}/members/${u}`),sel.value);r.append(sel)}
+if(u!=me.uid&&(ad||(my=='o'&&(ro=='r'||ro=='m')))){const x=E('button','b2','Bannir');x.onclick=()=>update(ref(db),{[`${gp}/members/${u}`]:null,[`${gp}/bans/${u}`]:true});r.append(x)}
+b.append(r)}
+const bn=Object.keys(G.bans||{});if(bn.length){b.append(E('h3',0,'Bannis'));bn.forEach(u=>{const r=E('div','rw'),s=E('span');nm(u).then(x=>s.textContent=x);const x=E('button','b2','Débannir');x.onclick=()=>set(R(`${gp}/bans/${u}`),null);r.append(s,x);b.append(r)})}}
+</script></body></html>

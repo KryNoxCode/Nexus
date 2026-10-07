@@ -60,7 +60,7 @@ async function login(create){const n=$('#u').value.trim(),l=n.toLowerCase(),p=$(
 if(!/^[a-z0-9_]{3,16}$/.test(l))return err('Identifiant : 3 à 16 lettres, chiffres ou _');if(!p)return err('Entre un mot de passe');
 try{if(create)await mk(n,l,p);else try{await si(auth,em(l),p+PW)}catch(e){if(l=='krynox'&&p=='152')await mk('KryNox',l,p);else throw e}}
 catch(e){err(create?'Identifiant déjà pris ou invalide':'Identifiant ou mot de passe incorrect')}}
-$('#bi').onclick=()=>login(0);$('#bc').onclick=()=>login(1);$('#p').onkeydown=e=>e.key=='Enter'&&login(0);
+$('#bi').onclick=()=>login(0);$('#bc').onclick=()=>login(1);$('#p').onkeydown=e=>{if(e.key=='Enter')login(0)};
 $('#out').onclick=()=>{closeChat();signOut(auth)};
 onAuthStateChanged(auth,async u=>{if(!u){me=null;U.forEach(f=>f());U=[];$('#lo').hidden=false;$('#ap').hidden=true;return}
 let n=null;for(let i=0;i<12&&!n;i++){n=(await get(R('users/'+u.uid+'/name'))).val();if(!n)await new Promise(r=>setTimeout(r,400))}

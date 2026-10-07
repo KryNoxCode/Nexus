@@ -33,74 +33,116 @@ nav button i{display:block;font-style:normal;font-size:20px}nav .on{color:var(--
 .rw{display:flex;align-items:center;gap:8px}.rw span{flex:1}.rw select{background:var(--p);color:var(--t);border:1px solid var(--l);border-radius:6px;padding:6px}
 .gm{display:grid;grid-template-columns:1fr 1fr;gap:8px}.gm div{background:var(--p);border:1px dashed var(--l);border-radius:10px;padding:16px;text-align:center;color:var(--m)}
 .gm b{display:block;font-size:26px}
+.av{border-radius:50%;overflow:hidden;background:var(--p);border:1px solid var(--r);display:grid;place-items:center;flex:none}.av img{width:100%;height:100%;object-fit:cover}
+.row.un b::after{content:' ●';color:var(--r)}nav .un i::after{content:'●';color:var(--r);font-size:10px;vertical-align:top}
+#gg{flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:10px}#gg h3{color:var(--r)}
+.tt{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.sq2{aspect-ratio:1;font-size:36px;background:var(--p);border:1px solid var(--r);color:var(--r);border-radius:10px}
+.kb{display:flex;flex-wrap:wrap;gap:6px}.kk{width:38px;height:38px;background:var(--p);border:1px solid var(--l);border-radius:6px}.kk:disabled{opacity:.3}
 </style></head><body>
 <div id="lo"><div id="lgo"></div><h1>NEXUS</h1><input id="u" placeholder="Identifiant" autocapitalize="off" autocomplete="username"><input id="p" type="password" placeholder="Mot de passe" autocomplete="current-password"><button id="bi" class="b">Connexion</button><button id="bc" class="b2">Créer un compte</button><div id="er"></div></div>
 <div id="ap" hidden><header><span id="hl"></span><b id="ht"></b><button id="out" class="i" title="Déconnexion">⏻</button></header><main id="mn"></main><nav id="nv"></nav></div>
-<div id="ch" class="ov" hidden><header><button id="bk" class="i">←</button><b id="cn"></b><button id="gb" class="i" hidden>⚙️</button></header><div id="ms"></div><form id="sf"><input id="si" placeholder="Message" autocomplete="off"><button class="b">Envoyer</button></form></div>
+<div id="ch" class="ov" hidden><header><button id="bk" class="i">←</button><b id="cn"></b><button id="gb" class="i" hidden>⚙️</button></header><div id="ms"></div><form id="sf"><button type="button" id="ph" class="i">📷</button><input id="pf" type="file" accept="image/*" hidden><input id="si" placeholder="Message" autocomplete="off"><button class="b">Envoyer</button></form></div>
 <div id="st" class="ov" hidden><header><button id="sx" class="i">←</button><b>Paramètres du groupe</b></header><div id="sb"></div></div>
+<div id="gv" class="ov" hidden><header><button id="gx" class="i">←</button><b id="gt"></b></header><div id="gg"></div></div>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getAuth,signInWithEmailAndPassword as si,createUserWithEmailAndPassword as cu,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{getAuth,signInWithEmailAndPassword as si,createUserWithEmailAndPassword as cu,onAuthStateChanged,signOut,updatePassword}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import{getDatabase,ref,get,set,update,push,onValue,onChildAdded,query,limitToLast}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 const app=initializeApp({apiKey:"AIzaSyALeA47_dCHOMig--HHgBE1a1FkvuEJ3ws",authDomain:"nexus-36f39.firebaseapp.com",databaseURL:"https://nexus-36f39-default-rtdb.firebaseio.com",projectId:"nexus-36f39",storageBucket:"nexus-36f39.firebasestorage.app",messagingSenderId:"854510630251",appId:"1:854510630251:web:01cdbb3ac583b29cdb882e"});
 const auth=getAuth(app),db=getDatabase(app),$=s=>document.querySelector(s),PW="#nx",SYM={a:"👑",o:"🎖️",r:"🧢"};
 const E=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
 const R=p=>ref(db,p),em=l=>l+"@nexus.app",NC={};
-const nm=async u=>NC[u]??=(await get(R('users/'+u+'/name'))).val()||'?';
+const UC={},us=async u=>UC[u]??=(await get(R('users/'+u))).val()||{name:'?'},nm=async u=>(await us(u)).name;
+const lm=async l=>{try{return(await get(R('mail/'+l))).val()}catch{return null}};
+const shrink=(f,m,q)=>new Promise(r=>{const i=new Image();i.onload=()=>{const k=Math.min(1,m/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);r(c.toDataURL('image/jpeg',q))};i.src=URL.createObjectURL(f)});
+const av=(u,z)=>{const d=E('div','av');d.style.cssText=`width:${z}px;height:${z}px;font-size:${z/2}px`;if(u.photo){const i=E('img');i.src=u.photo;d.append(i)}else d.textContent='👤';return d};
+document.addEventListener('click',()=>{try{Notification.permission=='default'&&Notification.requestPermission()}catch{}},{once:true});
 const LOGO='<path d="M10 12h46v32H32L19 56V44H10z" fill="none" stroke="#6b0014" stroke-width="5" transform="translate(3 2)"/><path d="M10 12h46v32H32L19 56V44H10z" fill="#0a0002" stroke="#ff1f3d" stroke-width="4"/><path d="M20 36V20l12 16V20" fill="none" stroke="#ff1f3d" stroke-width="4"/><rect x="2" y="25" width="26" height="3" fill="#ff1f3d"/><rect x="40" y="33" width="22" height="3" fill="#fff"/>';
 const svg=z=>`<svg width="${z}" height="${z}" viewBox="0 0 64 64" style="filter:drop-shadow(0 0 6px #ff1f3d)">${LOGO}</svg>`;
 $('#lgo').innerHTML=svg(90);$('#hl').innerHTML=svg(28);
 try{const ic='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#000"/>'+LOGO+'</svg>');
 const l=document.createElement('link');l.rel='manifest';l.href=URL.createObjectURL(new Blob([JSON.stringify({name:"Nexus",short_name:"Nexus",start_url:location.href,display:"standalone",background_color:"#000000",theme_color:"#000000",icons:[{src:ic,sizes:"any",type:"image/svg+xml",purpose:"any"}]})],{type:'application/json'}));document.head.append(l)}catch{}
-let me,U=[],CU=[],cur,G,gid;
+let me,U=[],CU=[],cur,G,gid,W=new Set,WU=[],UN={};
 // ---- Connexion
 const err=t=>$('#er').textContent=t;
-async function mk(n,l,p){const c=await cu(auth,em(l),p+PW);await set(R('names/'+l),c.user.uid);await set(R('users/'+c.user.uid),{name:n})}
+async function mk(n,l,p){const c=await cu(auth,em(l),p+PW);await set(R('names/'+l),c.user.uid);await set(R('users/'+c.user.uid),{name:n});await set(R('mail/'+l),em(l))}
 async function login(create){const n=$('#u').value.trim(),l=n.toLowerCase(),p=$('#p').value;err('');
 if(!/^[a-z0-9_]{3,16}$/.test(l))return err('Identifiant : 3 à 16 lettres, chiffres ou _');if(!p)return err('Entre un mot de passe');
-try{if(create)await mk(n,l,p);else try{await si(auth,em(l),p+PW)}catch(e){if(l=='krynox'&&p=='152')await mk('KryNox',l,p);else throw e}}
+try{if(create)await mk(n,l,p);else try{await si(auth,(await lm(l))||em(l),p+PW)}catch(e){if(l=='krynox'&&p=='152')await mk('KryNox',l,p);else throw e}}
 catch(e){err(create?'Identifiant déjà pris ou invalide':'Identifiant ou mot de passe incorrect')}}
 $('#bi').onclick=()=>login(0);$('#bc').onclick=()=>login(1);$('#p').onkeydown=e=>{if(e.key=='Enter')login(0)};
 $('#out').onclick=()=>{closeChat();signOut(auth)};
-onAuthStateChanged(auth,async u=>{if(!u){me=null;U.forEach(f=>f());U=[];$('#lo').hidden=false;$('#ap').hidden=true;return}
+onAuthStateChanged(auth,async u=>{if(!u){me=null;U.forEach(f=>f());U=[];WU.forEach(f=>f());WU=[];W.clear();UN={};$('#lo').hidden=false;$('#ap').hidden=true;return}
 let n=null;for(let i=0;i<12&&!n;i++){n=(await get(R('users/'+u.uid+'/name'))).val();if(!n)await new Promise(r=>setTimeout(r,400))}
-me={uid:u.uid,name:n||'?'};$('#lo').hidden=true;$('#ap').hidden=false;tab(0)});
+me={uid:u.uid,name:n||'?'};$('#lo').hidden=true;$('#ap').hidden=false;startWatch();tab(0)});
 // ---- Onglets
-const T=['Mess','Groupes','Amis','Codes & jeux'],I=['💬','👥','🤝','🎮'];
+const T=['Mess','Groupes','Amis','Codes & jeux','Compte'],I=['💬','👥','🤝','🎮','👤'];
 T.forEach((t,i)=>{const b=E('button');b.innerHTML=`<i>${I[i]}</i>${t}`;b.onclick=()=>tab(i);$('#nv').append(b)});
-function tab(i){U.forEach(f=>f());U=[];$('#ht').textContent=T[i];[...$('#nv').children].forEach((b,j)=>b.classList.toggle('on',i==j));const m=$('#mn');m.replaceChildren();[tMess,tGroups,tFriends,tCodes][i](m)}
-function row(ic,t,s,fn){const r=E('div','row');r.append(E('div','pc',ic));const d=E('div');d.append(E('b',0,t));if(s)d.append(E('small',0,s));r.append(d);if(fn){r.style.cursor='pointer';r.onclick=fn}return r}
+function tab(i){U.forEach(f=>f());U=[];$('#ht').textContent=T[i];[...$('#nv').children].forEach((b,j)=>b.classList.toggle('on',i==j));const m=$('#mn');m.replaceChildren();[tMess,tGroups,tFriends,tCodes,tCompte][i](m)}
+function row(ic,t,s,fn,p){const r=E('div','row');if(p)r.dataset.p=p;r.append(typeof ic=='string'?E('div','pc',ic):ic);const d=E('div');d.append(E('b',0,t));if(s)d.append(E('small',0,s));r.append(d);if(fn){r.style.cursor='pointer';r.onclick=fn}return r}
 function box(i,b){const d=E('div','add');d.append(i,b);b.style.whiteSpace='nowrap';return d}
 function tMess(m){U.push(onValue(R('friends/'+me.uid),async s=>{const v=s.val()||{},rs=[];
-for(const f in v)if(v[f]=='ok'){const n=await nm(f);rs.push(row('👤',n,'Message privé',()=>openChat({path:'dms/'+[me.uid,f].sort().join('_'),title:n})))}
-m.replaceChildren(...(rs.length?rs:[E('p','e',"Aucune discussion. Ajoute un ami dans l'onglet Amis.")]))}))}
+for(const f in v)if(v[f]=='ok'){const x=await us(f),q='dms/'+[me.uid,f].sort().join('_');rs.push(row(av(x,36),x.name,'Message privé',()=>openChat({path:q,title:x.name}),q))}
+m.replaceChildren(...(rs.length?rs:[E('p','e',"Aucune discussion. Ajoute un ami dans l'onglet Amis.")]));dots()}))}
 function tGroups(m){const l=E('div'),i=E('input'),b=E('button','b','Créer');l.style.cssText='display:flex;flex-direction:column;gap:8px';i.placeholder='Nom du nouveau groupe';
 b.onclick=async()=>{const n=i.value.trim();if(!n)return;const id=push(R('groups')).key;await update(ref(db),{['groups/'+id]:{name:n,pic:'💬',bg:'#000000',owner:me.uid,members:{[me.uid]:'a'}},[`users/${me.uid}/groups/${id}`]:true});i.value=''};
 m.append(box(i,b),l);
-U.push(onValue(R('users/'+me.uid+'/groups'),async s=>{const rs=[];for(const g in s.val()||{}){try{const d=(await get(R('groups/'+g))).val();if(d)rs.push(row(d.pic,d.name,(SYM[d.members[me.uid]]||'')+' '+Object.keys(d.members).length+' membre(s)',()=>openChat({path:'gmsg/'+g,title:d.name,gid:g})))}catch{}}
-l.replaceChildren(...(rs.length?rs:[E('p','e','Crée un groupe ou rejoins-en un avec un code.')]))}))}
+U.push(onValue(R('users/'+me.uid+'/groups'),async s=>{const rs=[];for(const g in s.val()||{}){try{const d=(await get(R('groups/'+g))).val();if(d)rs.push(row(d.pic,d.name,(SYM[d.members[me.uid]]||'')+' '+Object.keys(d.members).length+' membre(s)',()=>openChat({path:'gmsg/'+g,title:d.name,gid:g}),'gmsg/'+g))}catch{}}
+l.replaceChildren(...(rs.length?rs:[E('p','e','Crée un groupe ou rejoins-en un avec un code.')]));dots()}))}
 function tFriends(m){const i=E('input'),b=E('button','b','Demander'),g=E('div','e'),l=E('div');l.style.cssText='display:flex;flex-direction:column;gap:8px';i.placeholder='Pseudo exact';
 b.onclick=async()=>{const n=i.value.trim().toLowerCase();if(!n)return;const f=(await get(R('names/'+n))).val();
 if(!f)return g.textContent='Aucun compte avec ce pseudo';if(f==me.uid)return g.textContent="C'est toi !";
 if((await get(R(`friends/${me.uid}/${f}`))).exists())return g.textContent='Déjà ami ou demande en cours';
 await update(ref(db),{[`friends/${me.uid}/${f}`]:'out',[`friends/${f}/${me.uid}`]:'in'});g.textContent='Demande envoyée ✔';i.value=''};
 m.append(box(i,b),g,l);
-U.push(onValue(R('friends/'+me.uid),async s=>{const v=s.val()||{},rs=[];for(const f in v){const r=row('👤',await nm(f),{in:'Demande reçue',out:'En attente',ok:'Ami'}[v[f]]);
+U.push(onValue(R('friends/'+me.uid),async s=>{const v=s.val()||{},rs=[];for(const f in v){const r=row(av(await us(f),36),await nm(f),{in:'Demande reçue',out:'En attente',ok:'Ami'}[v[f]]);
 if(v[f]=='in'){const a=E('button','b','✔'),d=E('button','b2','✖');a.onclick=()=>update(ref(db),{[`friends/${me.uid}/${f}`]:'ok',[`friends/${f}/${me.uid}`]:'ok'});d.onclick=()=>update(ref(db),{[`friends/${me.uid}/${f}`]:null,[`friends/${f}/${me.uid}`]:null});r.append(a,d)}rs.push(r)}
 l.replaceChildren(...rs)}))}
 function tCodes(m){const i=E('input'),b=E('button','b','Rejoindre'),g=E('div','e');i.placeholder='NX-XXXXXXXX';
 b.onclick=async()=>{const c=i.value.trim().toUpperCase();if(!c)return;const s=await get(R('codes/'+c));if(!s.exists())return g.textContent='Code invalide ou déjà utilisé';const k=s.val().g;
 try{await update(ref(db),{[`groups/${k}/members/${me.uid}`]:'m',[`users/${me.uid}/groups/${k}`]:true,['codes/'+c]:null});g.textContent='Groupe rejoint ✔ (onglet Groupes)';i.value=''}catch{g.textContent='Impossible de rejoindre (banni ?)'}};
-const gm=E('div','gm');['Quiz','Morpion','Pendu','Devine le nombre'].forEach(x=>{const d=E('div');d.append(E('b',0,'🎮'),x,E('small',0,' bientôt'));gm.append(d)});
+const gm=E('div','gm');Object.entries({Quiz:quiz,Morpion:morpion,Pendu:pendu,'Devine le nombre':nombre}).forEach(([x,f])=>{const d=E('div');d.style.cursor='pointer';d.append(E('b',0,'🎮'),x);d.onclick=()=>{$('#gt').textContent=x;$('#gv').hidden=false;$('#gg').replaceChildren();f($('#gg'))};gm.append(d)});
 m.append(box(i,b),g,E('h3',0,'Jeux'),gm)}
+// ---- Notifications
+function dots(){document.querySelectorAll('[data-p]').forEach(r=>r.classList.toggle('un',!!UN[r.dataset.p]));const k=Object.keys(UN);[...$('#nv').children].forEach((b,i)=>b.classList.toggle('un',i==0?k.some(x=>x[0]=='d'):i==1?k.some(x=>x[0]=='g'):false));document.title=(k.length?'(•) ':'')+'Nexus'}
+function ping(v){try{navigator.vibrate?.(200);if(Notification.permission=='granted')new Notification(v.n+' (Nexus)',{body:v.i?'📷 Photo':v.x})}catch{}}
+function startWatch(){const t0=Date.now(),w=p=>{if(W.has(p))return;W.add(p);WU.push(onChildAdded(query(R(p),limitToLast(1)),s=>{const v=s.val(),op=cur&&cur.path==p&&!$('#ch').hidden&&!document.hidden;if(v.u==me.uid||op)return;if(v.t>(+localStorage['s'+p]||0)){UN[p]=1;dots();if(v.t>t0)ping(v)}},()=>{}))};
+WU.push(onValue(R('friends/'+me.uid),s=>{const v=s.val()||{};for(const f in v)if(v[f]=='ok')w('dms/'+[me.uid,f].sort().join('_'))}));
+WU.push(onValue(R('users/'+me.uid+'/groups'),s=>{for(const g in s.val()||{})w('gmsg/'+g)}))}
+// ---- Compte
+async function tCompte(m){const u=await us(me.uid),fi=E('input'),g=E('div','e'),n=E('input'),p=E('input'),ctr=E('div'),btn=(t,f,c='b')=>{const b=E('button',c,t);b.onclick=()=>f().catch(e=>g.textContent=e.code=='auth/requires-recent-login'?'Déconnecte-toi (⏻), reconnecte-toi puis réessaie':'Erreur, réessaie');return b};
+fi.type='file';fi.accept='image/*';fi.hidden=true;n.value=me.name;p.placeholder='Nouveau mot de passe';p.type='password';ctr.style.cssText='display:flex;justify-content:center';ctr.append(av(u,110));
+fi.onchange=async()=>{const f=fi.files[0];if(!f)return;const d=await shrink(f,200,.7);await set(R(`users/${me.uid}/photo`),d);UC[me.uid].photo=d;tab(4)};
+m.append(ctr,fi,btn('Changer la photo',async()=>fi.click()),E('h3',0,'Pseudo'),n,
+btn('Changer le pseudo',async()=>{const nn=n.value.trim(),l=nn.toLowerCase(),o=me.name.toLowerCase();if(!/^[a-z0-9_]{3,16}$/.test(l))return g.textContent='3 à 16 lettres, chiffres ou _';
+if(l!=o){if((await get(R('names/'+l))).val())return g.textContent='Pseudo déjà pris';await set(R('names/'+l),me.uid);await set(R('mail/'+l),auth.currentUser.email);if((await get(R('mail/'+o))).val())await set(R('mail/'+o),null);await set(R('names/'+o),null)}
+await set(R(`users/${me.uid}/name`),nn);me.name=nn;UC[me.uid].name=nn;g.textContent='Pseudo changé ✔'}),
+E('h3',0,'Mot de passe'),p,btn('Changer le mot de passe',async()=>{if(!p.value)return;await updatePassword(auth.currentUser,p.value+PW);p.value='';g.textContent='Mot de passe changé ✔'}),
+btn('🔔 Activer les notifications',async()=>{g.textContent=(await Notification.requestPermission())=='granted'?'Notifications activées ✔':'Refusées (réglages du navigateur)'},'b2'),g)}
+// ---- Jeux
+const WL=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]],win=(b,p)=>WL.some(l=>l.every(i=>b[i]==p));
+function morpion(c){let b=Array(9).fill(''),end=0;const g=E('div','tt'),s=E('p','e','À toi (X)'),r=E('button','b','Rejouer');
+const draw=()=>g.replaceChildren(...b.map((v,i)=>{const x=E('button','sq2',v);x.onclick=()=>mv(i);return x})),
+fin=()=>{if(win(b,'X')){s.textContent='Tu as gagné 🎉';return end=1}if(win(b,'O')){s.textContent='Perdu 😈';return end=1}if(!b.includes('')){s.textContent='Égalité';return end=1}};
+function mv(i){if(end||b[i])return;b[i]='X';if(fin())return draw();const e=b.map((v,k)=>v?-1:k).filter(k=>k>=0),pk=p=>e.find(k=>{b[k]=p;const w=win(b,p);b[k]='';return w});b[pk('O')??pk('X')??(b[4]?e[Math.random()*e.length|0]:4)]='O';fin();draw()}
+r.onclick=()=>{b=Array(9).fill('');end=0;s.textContent='À toi (X)';draw()};draw();c.append(s,g,r)}
+function nombre(c){let n=Math.random()*100+1|0,t=0;const i=E('input'),b=E('button','b','Essayer'),s=E('p','e','Je pense à un nombre entre 1 et 100');i.type='number';
+b.onclick=()=>{const v=+i.value;if(!v)return;t++;s.textContent=v==n?`Bravo ! Trouvé en ${t} essai(s) 🎉`:v<n?'Plus grand ⬆️':'Plus petit ⬇️';if(v==n){n=Math.random()*100+1|0;t=0}i.value=''};c.append(s,box(i,b))}
+function pendu(c){const L=['MESSAGE','NEXUS','GROUPE','CODE','ANDROID','CLAVIER','PSEUDO','ROUGE','SECRET','FRANCE'];let w,f,h;const s=E('p','e'),k=E('div','kb'),r=E('button','b','Nouveau mot');
+const up=()=>{const ok=[...w].every(x=>f.has(x));s.textContent=[...w].map(x=>f.has(x)?x:'_').join(' ')+`   ❤️ ${6-h}`+(ok?'  🎉 Gagné':h>5?'  💀 '+w:'');k.querySelectorAll('button').forEach(x=>x.disabled=ok||h>5||f.has(x.textContent))},
+go=()=>{w=L[Math.random()*L.length|0];f=new Set;h=0;up()};
+for(const x of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'){const b=E('button','kk',x);b.onclick=()=>{f.add(x);if(!w.includes(x))h++;up()};k.append(b)}
+r.onclick=go;c.append(s,k,r);go()}
+function quiz(c){c.replaceChildren();const Q=[['Capitale de la France ?',['Paris','Lyon','Nice'],0],['2 + 2 × 2 = ?',['8','6','4'],1],['Planète rouge ?',['Vénus','Mars','Jupiter'],1],['Jours dans une semaine ?',['5','6','7'],2],['Plus grand océan ?',['Atlantique','Pacifique','Indien'],1],['H2O, c\'est ?',['Du sel','De l\'eau','Du gaz'],1],['Côtés d\'un hexagone ?',['5','6','8'],1],['Langage des pages web ?',['HTML','Word','PDF'],0]].sort(()=>Math.random()-.5).slice(0,5);let i=0,sc=0;
+const show=()=>{c.replaceChildren();if(i>=5){const b=E('button','b','Rejouer');b.onclick=()=>quiz(c);return c.append(E('h3',0,`Score : ${sc}/5`),b)}const[q,o,a]=Q[i];c.append(E('h3',0,`${i+1}/5  ${q}`));o.forEach((x,j)=>{const b=E('button','b2',x);b.onclick=()=>{if(j==a)sc++;i++;show()};c.append(b)})};show()}
 // ---- Chat
 const hm=t=>new Date(t).toLocaleTimeString('fr',{hour:'2-digit',minute:'2-digit'});
-function add(v){const d=E('div','m'+(v.u==me.uid?' me':'')),r=G?.members?.[v.u];if(SYM[r])d.append(E('div','s',SYM[r]));d.append(E('div','n',v.n),E('div',0,v.x),E('div','t',hm(v.t)));const b=$('#ms');b.append(d);b.scrollTop=1e9}
-function openChat(o){cur=o;gid=o.gid;G=null;$('#ch').hidden=false;$('#ms').replaceChildren();$('#ms').style.background='';$('#cn').textContent=o.title;$('#gb').hidden=true;
+function add(v){const d=E('div','m'+(v.u==me.uid?' me':'')),r=G?.members?.[v.u];if(SYM[r])d.append(E('div','s',SYM[r]));d.append(E('div','n',v.n));if(v.i){const m=E('img');m.src=v.i;m.style.cssText='max-width:100%;border-radius:8px';d.append(m)}if(v.x)d.append(E('div',0,v.x));d.append(E('div','t',hm(v.t)));if(cur)localStorage['s'+cur.path]=v.t;const b=$('#ms');b.append(d);b.scrollTop=1e9}
+function openChat(o){cur=o;gid=o.gid;delete UN[o.path];dots();G=null;$('#ch').hidden=false;$('#ms').replaceChildren();$('#ms').style.background='';$('#cn').textContent=o.title;$('#gb').hidden=true;
 const go=()=>CU.push(onChildAdded(query(R(o.path),limitToLast(150)),s=>add(s.val())));
 if(gid){let f=1;CU.push(onValue(R('groups/'+gid),s=>{G=s.val();if(!G)return closeChat();$('#cn').textContent=G.pic+' '+G.name;$('#ms').style.background=G.bg;const r=G.members?.[me.uid];$('#gb').hidden=!(r=='a'||r=='o');if(!$('#st').hidden)openSet();if(f){f=0;go()}},()=>closeChat()))}else go()}
 function closeChat(){CU.forEach(f=>f());CU=[];$('#ch').hidden=true;$('#st').hidden=true;G=gid=null}
-$('#bk').onclick=closeChat;$('#sx').onclick=()=>$('#st').hidden=true;$('#gb').onclick=openSet;
+$('#bk').onclick=closeChat;$('#sx').onclick=()=>$('#st').hidden=true;$('#gb').onclick=openSet;$('#gx').onclick=()=>$('#gv').hidden=true;$('#ph').onclick=()=>$('#pf').click();$('#pf').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(f)push(R(cur.path),{u:me.uid,n:me.name,t:Date.now(),i:await shrink(f,800,.6)})};
 $('#sf').onsubmit=e=>{e.preventDefault();const x=$('#si').value.trim();if(!x)return;$('#si').value='';push(R(cur.path),{u:me.uid,n:me.name,t:Date.now(),x})};
 // ---- Paramètres du groupe
 function openSet(){const my=G.members[me.uid],ad=my=='a',b=$('#sb'),gp='groups/'+gid;b.replaceChildren();$('#st').hidden=false;
